@@ -36,7 +36,7 @@ export default function SignIn() {
     const [signInError, setSignInError] = useState(false);
     const [signInErrorMessage, setSignInErrorMessage] = useState("");
 
-    const[redirectInfo, setRedirectInfo] = useState(false);
+    const[navigationInfo, setNavigationInfo] = useState(false);
 
     const {setUser, setIsLoggedIn} = useAuthentication();
 
@@ -47,7 +47,7 @@ export default function SignIn() {
 
     useEffect(() => {
         if (state) {
-            handleRedirectInfo();
+            setNavigationInfo(true);
         }
     }, []);
 
@@ -130,16 +130,12 @@ export default function SignIn() {
         setSignInError(false);
     }
 
-    function handleRedirectInfo() {
-        setRedirectInfo(true);
-    }
-
     function handleInfoClose(event, reason) {
         if (reason === 'clickaway') {
             return;
         }
 
-        setRedirectInfo(false);
+        setNavigationInfo(false);
     }
 
     return (
@@ -220,7 +216,7 @@ export default function SignIn() {
                 </Alert>
             </Snackbar>
 
-            <Snackbar open={redirectInfo} autoHideDuration={6000} onClose={handleInfoClose}>
+            <Snackbar open={navigationInfo} autoHideDuration={6000} onClose={handleInfoClose}>
                 <Alert severity="info" variant="filled" onClose={handleInfoClose} sx={{width: "100%"}}>
                     {state?.feedback}
                 </Alert>

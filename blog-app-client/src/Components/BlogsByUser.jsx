@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
@@ -7,6 +7,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import ListBlogs from "./ListBlogs.jsx";
 import {Link as ReactRouterLink} from "react-router-dom";
 import Link from "@mui/material/Link";
+import Snackbar from '@mui/material/Snackbar';
 
 export default function BlogsByUser() {
     const [blogs, setBlogs] = useState([]);
@@ -15,6 +16,18 @@ export default function BlogsByUser() {
 
     const params = useParams();
     const userID = parseInt(params.id);
+
+    const[navigationInfo, setNavigationInfo] = useState(false);
+
+    const location = useLocation();
+    const state = location.state;
+
+    function handleAlertClose(event, reason) {
+        if (reason === "clickaway") {
+            return;
+        }
+        setNavigationInfo(false);
+    }
 
     useEffect(() => {
         const abortController = new AbortController();
@@ -44,6 +57,10 @@ export default function BlogsByUser() {
         }
 
         fetchPosts();
+
+        if (state) {
+            setNavigationInfo(true);
+        }
 
         // Clean-up
         return () => {
@@ -91,6 +108,11 @@ export default function BlogsByUser() {
                     </Typography>
                 }
             </Box>
+            <Snackbar anchorOrigin={{vertical: 'bottom', horizontal: 'center'}} open={navigationInfo} autoHideDuration={6000} onClose={handleAlertClose}>
+                <Alert severity="success" variant="filled" onClose={handleAlertClose} sx={{width: "75vw"}}>
+                    {state?.success}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }
