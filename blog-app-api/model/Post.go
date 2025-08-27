@@ -2,9 +2,10 @@ package model
 
 import (
 	"blog-app/database"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type Post struct {
@@ -38,7 +39,7 @@ func CreatePost(context *gin.Context) {
 	}
 
 	// Confirm post has been created
-	context.JSON(http.StatusOK, gin.H{"message": "Blog post created", "postID": post.ID})
+	context.JSON(http.StatusOK, gin.H{"message": "Blog post created successfully", "postID": post.ID})
 }
 
 func ListPosts(context *gin.Context) {

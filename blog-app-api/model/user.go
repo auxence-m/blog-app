@@ -2,9 +2,10 @@ package model
 
 import (
 	"blog-app/database"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type User struct {

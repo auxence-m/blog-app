@@ -3,8 +3,9 @@ package main
 import (
 	"blog-app/database"
 	"blog-app/model"
-	"github.com/gin-gonic/gin"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
