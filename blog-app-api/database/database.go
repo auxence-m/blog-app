@@ -1,9 +1,10 @@
 package database
 
 import (
+	"log"
+
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
-	"log"
 )
 
 var DB *gorm.DB
