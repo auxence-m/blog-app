@@ -1,12 +1,11 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useEffect, useRef, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import Stack from "@mui/material/Stack";
-import BackToTopButton from "./BackToTopButton.jsx";
 import FormLabel from "@mui/material/FormLabel";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
@@ -18,21 +17,30 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import { Link as ReactRouterLink } from "react-router-dom";
 import {BackHomeButton} from "./Utils.jsx";
+import {useAuthentication} from "../../AuthenticationContext.jsx";
 
 export default function BlogDetails() {
     const [post, setPost] = useState(null);
     const [error, setError] = useState("");
+
+    const blogRef = useRef(null);
     const params = useParams();
     const postId = params.id;
 
-    const[isEditing, setIsEditing] = useState(false);
-    const[title, setTitle] = useState("");
-    const[content, setContent] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
 
-    const[openDialog, setOpenDialog] = useState(false);
-    const[openSnackbar, setOpenSnackbar] = useState(false);
-    const[editError, setEditError] = useState(false);
-    const[snackbarText, setSnackbarText] = useState("");
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarText, setSnackbarText] = useState("");
+
+    const [modificationError, setModificationError] = useState(false);
+
+    const navigate = useNavigate();
+    const {user, isLoggedIn} = useAuthentication();
 
     function validateEdit() {
         return !content || !title || (title.trim() === post.title.trim() && content.trim() === post.content.trim());
@@ -43,6 +51,11 @@ export default function BlogDetails() {
             return;
         }
         setOpenSnackbar(false);
+    }
+
+    function handleEditClick() {
+        setIsEditing(true);
+        blogRef.current?.scrollIntoView();
     }
 
     async function getPost(abortSignal) {
@@ -68,7 +81,7 @@ export default function BlogDetails() {
         }
     }
 
-    async function handleEditSubmit(event) {
+    async function handleEditPost(event) {
         event.preventDefault();
         const authorId = post.authorId;
         const category = post.category
@@ -84,22 +97,47 @@ export default function BlogDetails() {
 
             if (response.ok) {
                 setSnackbarText("Blog post successfully updated");
-                setEditError(false);
+                setModificationError(false);
             } else {
-                setSnackbarText("Failed to update blog post");
-                setEditError(true);
+                setSnackbarText("Failed to update blog post. Please try again later");
+                setModificationError(true);
             }
         } catch (error) {
             setSnackbarText("Something unexpected happened. Please try again later");
-            setEditError(true);
+            setModificationError(true);
         } finally {
             setIsEditing(false);
-            setOpenDialog(false);
+            setOpenEditDialog(false);
             setOpenSnackbar(true);
 
             const abortController = new AbortController();
             const signal = abortController.signal;
             await getPost(signal);
+        }
+    }
+
+    async function handleDeletePost(event) {
+        event.preventDefault();
+        const authorID = post.authorId;
+
+        try {
+            const response = await fetch(`/api/posts/${postId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+
+            if (response.ok) {
+                setModificationError(false);
+                navigate(`/your-posts/${authorID}`, {state: {success: "Blog posts deleted successfully"}});
+            } else {
+                setSnackbarText("Failed to deleted blog post. Please try again later");
+                setModificationError(true);
+            }
+        } catch (error) {
+            setSnackbarText("Something unexpected happened. Please try again later");
+            setModificationError(true);
         }
     }
 
@@ -124,8 +162,7 @@ export default function BlogDetails() {
 
                 {
                     post !== null &&
-                    <Box>
-                        <BackToTopButton></BackToTopButton>
+                    <Box ref={blogRef}>
                         <Box>
                             <Box marginBottom={2}>
                                 <BackHomeButton variant="text" component={ReactRouterLink} to="/" startIcon={<NavigateBeforeIcon />}>
@@ -179,36 +216,63 @@ export default function BlogDetails() {
                                 )
                             }
                         </Box>
-                        <Box display="flex" justifyContent="flex-end" marginTop={3}>
+                        <Box display={(user?.userID === post.authorId && isLoggedIn) ? "flex" : "none"} justifyContent="space-between" marginTop={4}>
                             <Box display={isEditing === true ? "none" : "block"}>
-                                <Button variant="contained" onClick={() => {setIsEditing(true)}}>Edit Post</Button>
+                                <Button variant="contained" color="error" onClick={() => {setOpenDeleteDialog(true)}}>
+                                    Delete Post
+                                </Button>
                             </Box>
-                            <Stack display={isEditing === true ? "block" : "none"} direction="row" spacing={2}>
-                                <Button variant="contained" disabled={validateEdit()} onClick={()=> {setOpenDialog(true)}} >Save Edit</Button>
-                                <Button variant="outlined" onClick={() => {setIsEditing(false)}}>Cancel</Button>
-                            </Stack>
+                            <Box>
+                                <Box display={isEditing === true ? "none" : "block"}>
+                                    <Button variant="contained" onClick={handleEditClick}>Edit Post</Button>
+                                </Box>
+                                <Stack display={isEditing === true ? "block" : "none"} direction="row" spacing={2}>
+                                    <Button variant="contained" disabled={validateEdit()} onClick={()=> {setOpenEditDialog(true)}}>
+                                        Save Edit
+                                    </Button>
+                                    <Button variant="outlined" onClick={() => {setIsEditing(false)}}>Cancel</Button>
+                                </Stack>
+                            </Box>
                         </Box>
                     </Box>
                 }
             </Box>
-            <Dialog open={openDialog} onClose={() => {setOpenDialog(false)}} >
-                <Box sx={{ backgroundColor: 'background.default'}}>
-                    <DialogTitle id="alert-dialog-title">
-                        Post edit confirmation
-                    </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Are you sure you want save the modifications made on this post ?
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => {setOpenDialog(false)}}>Cancel</Button>
-                        <Button onClick={handleEditSubmit}>Confirm</Button>
-                    </DialogActions>
-                </Box>
-            </Dialog>
+            <Box>
+                <Dialog open={openEditDialog} onClose={() => {setOpenEditDialog(false)}}>
+                    <Box sx={{ backgroundColor: 'background.default'}}>
+                        <DialogTitle id="alert-dialog-title">
+                            Post edit confirmation
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Are you sure you want to save the modifications made on this post ?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => {setOpenEditDialog(false)}}>Cancel</Button>
+                            <Button onClick={handleEditPost}>Confirm</Button>
+                        </DialogActions>
+                    </Box>
+                </Dialog>
+                <Dialog open={openDeleteDialog} onClose={() => {setOpenDeleteDialog(false)}}>
+                    <Box sx={{ backgroundColor: 'background.default'}}>
+                        <DialogTitle id="alert-dialog-title">
+                            Post deletion confirmation
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Are you sure you want to delete this post ?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => {setOpenDeleteDialog(false)}}>Cancel</Button>
+                            <Button onClick={handleDeletePost}>Confirm</Button>
+                        </DialogActions>
+                    </Box>
+                </Dialog>
+            </Box>
             <Snackbar anchorOrigin={{vertical: 'bottom', horizontal: 'center'}} open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                <Alert sx={{width: "75vw"}} severity={editError === true ? "error" : "success"} variant="filled" onClose={handleSnackbarClose}>
+                <Alert sx={{width: "75vw"}} severity={modificationError === true ? "error" : "success"} variant="filled" onClose={handleSnackbarClose}>
                     {snackbarText}
                 </Alert>
             </Snackbar>
