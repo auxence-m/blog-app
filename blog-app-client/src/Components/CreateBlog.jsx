@@ -117,6 +117,9 @@ export default function CreateBlog() {
             <Typography variant="h6" gutterBottom>
                 Create a new blog post
             </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+                What's on your mind today ?
+            </Typography>
             <Box display="flex" flexDirection="column" justifyContent="space-between" gap={3} marginTop={2}
                  component="form" onSubmit={handleSubmit} noValidate>
                 <FormControl>

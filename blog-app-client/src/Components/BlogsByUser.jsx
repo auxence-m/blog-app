@@ -8,6 +8,7 @@ import ListBlogs from "./ListBlogs.jsx";
 import {Link as ReactRouterLink} from "react-router-dom";
 import Link from "@mui/material/Link";
 import Snackbar from '@mui/material/Snackbar';
+import {useAuthentication} from "../../AuthenticationContext.jsx";
 
 export default function BlogsByUser() {
     const [blogs, setBlogs] = useState([]);
@@ -21,6 +22,8 @@ export default function BlogsByUser() {
 
     const location = useLocation();
     const state = location.state;
+
+    const {user} = useAuthentication();
 
     function handleAlertClose(event, reason) {
         if (reason === "clickaway") {
@@ -72,7 +75,15 @@ export default function BlogsByUser() {
         <Box display="flex" flexDirection="column" justifyContent="center">
             <Box marginBottom={2}>
                 <Typography variant="h6" gutterBottom>
-                    Here are all of your posts
+                    Welcome back {" "}
+                    <span>
+                        <Typography component="span" variant="inherit" color="primary" noWrap>
+                            {user?.username} !
+                        </Typography>
+                    </span>
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                    Manage your published blog posts here !
                 </Typography>
             </Box>
 
@@ -94,7 +105,7 @@ export default function BlogsByUser() {
 
                 {
                     blogs.length > 0 &&
-                    <ListBlogs blogPosts={blogs} title={"Your Posts"}></ListBlogs>
+                    <ListBlogs blogPosts={blogs}></ListBlogs>
 
                 }
 

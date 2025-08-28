@@ -1,18 +1,15 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {useAuthentication} from "../../AuthenticationContext.jsx";
 import {useEffect, useState} from "react";
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import ListBlogs from "./ListBlogs.jsx";
-
 
 export default function HomePage() {
     const [allPosts, setAllPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const {user, isLoggedIn} = useAuthentication();
 
     useEffect(() => {
         const abortController = new AbortController();
@@ -54,10 +51,10 @@ export default function HomePage() {
 
             <Box marginBottom={2}>
                 <Typography variant="h6" gutterBottom>
-                    {
-                        isLoggedIn ? `Welcome ${user.username} !` : "Welcome"
-                    }
-
+                    Explore New Blogs
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                    Stay in the loop. See what others are writing about
                 </Typography>
             </Box>
 
@@ -79,7 +76,7 @@ export default function HomePage() {
 
                 {
                     allPosts.length > 0 &&
-                    <ListBlogs blogPosts={allPosts} title={"Posts"}></ListBlogs>
+                    <ListBlogs blogPosts={allPosts}></ListBlogs>
                 }
             </Box>
         </Box>

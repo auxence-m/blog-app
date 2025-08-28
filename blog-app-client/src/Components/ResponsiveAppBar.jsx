@@ -11,7 +11,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import {styled} from "@mui/material/styles";
 import {useState} from "react";
-import { Link as ReactRouterLink } from "react-router-dom";
+import {Link as ReactRouterLink} from "react-router-dom";
+import {NavLink as BaseNavLink} from 'react-router-dom';
 import {useAuthentication} from "../../AuthenticationContext.jsx";
 import ColorThemeButton from "./ColorThemeButton.jsx";
 import Stack from '@mui/material/Stack';
@@ -39,6 +40,18 @@ const StyledToolBar = styled(Toolbar)(({theme}) => ({
     padding: "8px 15px",
 }));
 
+const StyledNavLink = styled(BaseNavLink)(({theme}) => ({
+    color: theme.palette.secondary.light,
+    marginLeft: theme.spacing(0.5),
+    textDecoration: 'none',
+    "&.active" : {
+        backgroundColor: theme.palette.action.hover,
+        color: theme.palette.secondary.dark,
+        borderRadius: `calc(${theme.shape.borderRadius}px + 2px)`,
+
+    },
+}));
+
 export default function ResponsiveAppBar() {
     const [open, setOpen] = useState(false);
 
@@ -64,12 +77,21 @@ export default function ResponsiveAppBar() {
                             <LogoIcon></LogoIcon>
                         </Box>
                         <Box sx={{display: {xs: 'none', md: 'flex'}}}>
-                            <Button color="info" variant="text" component={ReactRouterLink} to={`/your-posts/${user?.userID}`}>
-                                My posts
-                            </Button>
-                            <Button color="info" variant="text" component={ReactRouterLink} to="/create">
-                                Create a post
-                            </Button>
+                            <StyledNavLink to="/">
+                                <Button color="info" variant="text">
+                                    Home
+                                </Button>
+                            </StyledNavLink>
+                            <StyledNavLink to={`/your-posts/${user?.userID}`}>
+                                <Button color="info" variant="text">
+                                    My posts
+                                </Button>
+                            </StyledNavLink>
+                            <StyledNavLink to="/create">
+                                <Button color="info" variant="text">
+                                    Create a post
+                                </Button>
+                            </StyledNavLink>
                         </Box>
                     </Box>
                     <Box sx={{display: {xs: 'none', md: 'flex'}, gap: 2, alignItems: "center"}}>
@@ -101,8 +123,15 @@ export default function ResponsiveAppBar() {
                                     </IconButton>
                                 </Box>
                                 <Box>
-                                    <MenuItem component={ReactRouterLink} to={`/your-posts/${user?.userID}`}>My posts</MenuItem>
-                                    <MenuItem component={ReactRouterLink} to="/create">Create a post</MenuItem>
+                                    <StyledNavLink to="/" onClick={() => {toggleDrawer(false)}}>
+                                        <MenuItem>Home</MenuItem>
+                                    </StyledNavLink >
+                                    <StyledNavLink to={`/your-posts/${user?.userID}`} onClick={() => {toggleDrawer(false)}}>
+                                        <MenuItem>My posts</MenuItem>
+                                    </StyledNavLink>
+                                    <StyledNavLink to="/create" onClick={() => {toggleDrawer(false)}}>
+                                        <MenuItem>Create a post</MenuItem>
+                                    </StyledNavLink>
                                 </Box>
                                 <Divider sx={{marginY: 2}}></Divider>
                                 <Box display={isLoggedIn ? "block" : "none"}>

@@ -20,7 +20,7 @@ const StyledTypography = styled(Typography)({
     textOverflow: 'ellipsis',
 });
 
-export default function ListBlogs ({blogPosts, title}) {
+export default function ListBlogs ({blogPosts}) {
     const categories = ["All categories", "Company", "Design", "Engineering", "Product"];
 
     const location = useLocation();
@@ -70,7 +70,7 @@ export default function ListBlogs ({blogPosts, title}) {
             <Box display="flex" flexDirection="column" justifyContent="space-between" gap={3} height="100%">
                 {
                     <Typography component="h2" variant="h6">
-                        {title}{" "}
+                        Posts {" "}
                         {
                             filter !== "All categories" &&
                             <span>
