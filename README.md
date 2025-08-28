@@ -1,46 +1,46 @@
 ## How to run
 
-### Simple way: with docker compose
+### Option 1: Simple way with Docker Compose
 - Clone the repository :
 ```
 git clone https://github.com/auxence-m/blog-app.git
 ```
 
-- Navigate to the location of the directory :
+- Navigate to the project directory :
 ```
 cd blog-app
 ```
 
-- Build and run the services **(-d flag allows you to run containers in the background, freeing up your terminal)** :
+- Use Docker Compose to start the application. The -d flag runs the containers in the background, freeing up your terminal :
 ```
 docker compose up --build -d
 ```
 
-- Access the app through ( http://localhost:5173/)
+- Access the app through (http://localhost:5173/)
 ```
  http://localhost:5173/
 ```
 
-- To stop services
+- To stop the running containers, use:
 ```
 docker compose stop
 ```
 
-- To stop and remove containers, networks, and volumes.
+- If you want to fully stop and clean up the Docker environment, run:
 ```
 docker compose down
 ```
 
-### Longer way: without docker compose
+### Option 2: Longer way without Docker Compose
 
-If you don't have docker installed on you computer, make sure you have the latest version of [Golang](https://go.dev/doc/install) and [Node.js](https://nodejs.org/en/download) installed on the computer.
+f you don't have Docker installed, you can run the app manually. Make sure you have the latest version of [Golang](https://go.dev/doc/install) and [Node.js](https://nodejs.org/en/download) installed.
 
 - Clone the repository :
 ```
 git clone https://github.com/auxence-m/blog-app.git
 ```
 
-- Navigate to the location of the directory :
+- Navigate to the project directory :
 ```
 cd blog-app
 ```
@@ -80,7 +80,7 @@ npm install
 npm run dev
 ```
 
-- Access the app through ( http://localhost:5173/)
+- Access the app through (http://localhost:5173/)
 ```
  http://localhost:5173/
 ```
