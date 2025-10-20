@@ -43,6 +43,7 @@ export default function ListBlogs ({blogPosts}) {
             setPage(0);
             return blogPosts.filter((post) => post.category === postCategory);
         }
+        setPage(0);
         return blogPosts;
     }, [blogPosts, postCategory]);
 
